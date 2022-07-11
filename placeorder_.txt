@@ -1,0 +1,82 @@
+<?php
+require_once "config.php";
+$name=$email=$phone=$ariving_date=$slots=$status="";
+$userexist=false;
+$update=false; 
+$error="";
+$clientemail="";
+$space=0;
+session_start();
+if(isset($_SESSION["parking_id"])){
+  $clientemail=$_SESSION["parking_id"];
+}
+$space=checkAvailableSpace($con);
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+ $name=$_POST['name'];
+ $email=$_POST['email'];
+ $phone=$_POST['phone'];
+ $ariving_date=$_POST['ariving_date'];
+ $slots=$_POST['slots'];
+ $status=$_POST['status'];
+ $userexist=checkuser($email,$con);
+if($email != $clientemail){
+	echo "error";
+	exit;
+}
+if ($userexist) {
+if($space < $slots){
+    echo "Check the space available before ordering";
+}else{
+    $update=updateDetails($ariving_date,$email,$slots,$status,$con);
+	if ($update) {
+	echo "The information updated succesful";
+	}else{
+	echo "There is an error please try again";;
+}
+}
+
+}
+}else{
+	echo "error";
+}
+
+
+function checkuser($email,$con){
+
+$sql="SELECT * FROM parking_clients where Email='$email'";
+$result = mysqli_query($con,$sql);
+if($row = mysqli_fetch_array($result)) {
+ return true;
+	}else{
+return false;
+	}
+}
+function updateDetails($ariving_date,$email,$slots,$status,$con){
+	$sql ="UPDATE parking_clients SET OrderTime='$ariving_date', Slots='$slots' , status='$status' WHERE email='$email'";
+	$result = mysqli_query($con,$sql);
+	if ($result) {
+	 return true;
+	}else{
+		return false;
+		$error="Error: " . mysqli_error($con);
+	}
+	mysqli_close($con);
+}
+function checkAvailableSpace($con){
+    $space=0;
+     $result=mysqli_query($con,"SELECT  max(id) FROM carpacking");
+while($row = mysqli_fetch_array($result)) {
+ $id= $row['max(id)'];
+
+}
+if ($id=="") {
+     $space=0;
+   }else{
+$result2=mysqli_query($con,"SELECT  space,time,location FROM carpacking WHERE id=$id");
+while($row = mysqli_fetch_array($result2)) {
+ $space= $row['space'];
+
+}}
+    return $space;
+}
+?>

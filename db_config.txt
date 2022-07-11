@@ -1,0 +1,13 @@
+<?php
+$db_name = "id18505384_projects";
+$db_user = "id18505384_ezzy";
+$db_pass = "19932703Ezzy.";
+$db_server = "localhost";
+$con = mysqli_connect($db_server,$db_user,$db_pass,$db_name);
+if(!$con){
+	echo  "connection error";
+}
+else{
+//echo  "connection succesful ";
+}
+?>
